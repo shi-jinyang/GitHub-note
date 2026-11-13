@@ -16,7 +16,7 @@ This repository records my journey of learning Git and GitHub.
 | Chapter | Topic | Status |
 |---|---|---|
 | 01 | GitHub Basics | In Progress |
-| 02 | Git Basics | Not Started |
+| 02 | Git Basics | In Progress |
 | 03 | Remote Repository | Not Started |
 | 04 | Branch Management | Not Started |
 | 05 | GitHub Collaboration | Not Started |
@@ -31,6 +31,7 @@ This repository records my journey of learning Git and GitHub.
 ## Learning Records
 
 I will continuously update this repository with learning notes, command examples, and practical exercises.
+
 ## 2026-11-13：Git 本地基础操作
 
 ### 1. Git 仓库初始化
@@ -72,6 +73,7 @@ Local Repository
 | `git diff --staged` | 查看暂存区与最近提交的差异 |
 | `git restore 文件名` | 撤销工作区未暂存的修改 |
 | `git restore --staged 文件名` | 取消暂存，保留工作区修改 |
+| `git reset --hard` | 将暂存区和工作区重置为最近一次提交的状态；会丢弃未提交的修改 |
 
 ### 4. 文件状态
 
