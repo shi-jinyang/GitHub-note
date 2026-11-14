@@ -18,7 +18,7 @@ This repository records my journey of learning Git and GitHub.
 | 01 | GitHub Basics | In Progress |
 | 02 | Git Basics | In Progress |
 | 03 | Remote Repository | Not Started |
-| 04 | Branch Management | Not Started |
+| 04 | Branch Management | In Progress |
 | 05 | GitHub Collaboration | Not Started |
 | 06 | Practical Exercises | Not Started |
 
@@ -86,3 +86,41 @@ Local Repository
 完成了本地 Git 仓库初始化、文件创建、暂存、提交、查看提交历史、查看文件差异，以及撤销修改的基础练习。
 
 下一课：Git 分支管理（Branch）。
+
+## 2026-11-14：Git 分支管理
+
+### 1. 分支基础
+- 分支用于独立开发不同功能，避免直接影响主线代码。
+- master 和 main 都是常见的主分支名称。
+- Git 创建分支时，本质上创建一个指向提交的引用。
+
+### 2. 常用命令
+
+| 命令 | 作用 |
+|---|---|
+| `git branch` | 查看本地分支 |
+| `git branch feature` | 创建 feature 分支 |
+| `git switch feature` | 切换到 feature 分支 |
+| `git switch master` | 切换到 master 分支 |
+| `git branch -d feature` | 删除 feature 分支 |
+| `git merge feature` | 将 feature 合并到当前分支 |
+
+### 3. 重要知识点
+- HEAD 通常指向当前分支。
+- 创建分支不会自动切换分支。
+- 不同分支可以拥有不同的提交记录。
+- 切换分支时，Git 会根据目标提交更新工作区。
+- 合并方向由当前所在分支决定。
+- Fast-forward 是一种快进合并方式，不需要创建额外的合并提交。
+
+### 4. 本课实践
+- 创建 feature 分支。
+- 在 feature 分支创建 feature.txt。
+- 提交新文件。
+- 切换回 master，观察 feature.txt 不存在。
+- 使用 git merge 将 feature 合并到 master。
+
+### 5. 本课总结
+掌握了 Git 分支的创建、切换、独立开发和合并操作。
+
+下一课：Git 合并冲突（Merge Conflict）。
