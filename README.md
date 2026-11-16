@@ -124,3 +124,85 @@ Local Repository
 掌握了 Git 分支的创建、切换、独立开发和合并操作。
 
 下一课：Git 合并冲突（Merge Conflict）。
+
+## 2026-11-16：Git 合并冲突（Merge Conflict）
+
+### 1. 什么是合并冲突？
+
+当两个分支都修改了同一文件的相同位置，而 Git 无法自动判断应该保留哪个版本时，就会产生合并冲突。
+
+### 2. 冲突标记
+
+发生冲突后，Git 会在文件中添加以下标记：
+
+```text
+<<<<<<< HEAD
+当前分支的内容
+=======
+被合并分支的内容
+>>>>>>> feature
+```
+
+- `<<<<<<< HEAD`：当前分支的内容。
+- `=======`：两个版本的分隔符。
+- `>>>>>>> feature`：被合并分支的内容。
+
+这些标记需要在解决冲突时删除。
+
+### 3. 解决合并冲突的步骤
+
+1. 执行 `git merge feature`，尝试合并分支。
+2. 使用编辑器打开冲突文件。
+3. 根据实际需求手动修改，保留最终需要的内容。
+4. 删除所有冲突标记。
+5. 执行 `git add README.md`，标记冲突已解决。
+6. 执行 `git commit`，完成合并提交。
+
+### 4. 常用命令
+
+| 命令 | 作用 |
+|---|---|
+| `git merge feature` | 合并 feature 分支 |
+| `git status` | 查看当前仓库状态 |
+| `git diff` | 查看文件修改 |
+| `git add README.md` | 标记冲突已解决并暂存文件 |
+| `git commit -m "Resolve merge conflict"` | 完成合并提交 |
+| `git merge --abort` | 放弃尚未完成的合并 |
+
+### 5. Merge Commit
+
+当两个分支分别产生新提交，无法通过 Fast-forward 合并时，Git 通常会创建一个 Merge Commit。
+
+Merge Commit 有两个父提交，分别指向合并前两个分支的最新提交。
+
+可以使用以下命令查看分支合并历史：
+
+```cmd
+git log --oneline --graph --decorate --all
+```
+
+### 6. 本课实验结果
+
+本次实验在 master 和 feature 分支中分别修改 README.md 的同一位置，成功制造合并冲突。
+
+手动解决冲突后，创建了合并提交：
+
+```text
+ae0db89 Resolve merge conflict
+```
+
+最终执行 `git status`，得到：
+
+```text
+On branch master
+nothing to commit, working tree clean
+```
+
+说明合并成功，工作区干净。
+
+### 7. 本课核心知识
+
+- Git 不一定能自动解决所有合并冲突。
+- 手动修改文件后，需要执行 `git add` 标记冲突已解决。
+- Merge Commit 通常有两个父提交。
+- `git merge --abort` 可以放弃尚未完成的合并。
