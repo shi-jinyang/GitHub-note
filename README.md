@@ -346,3 +346,230 @@ git log -1 --oneline
 4. 理解 HEAD 与当前分支的关系。
 5. 掌握将本地分支推送到不同名称的远程分支。
 6. 掌握使用 `-u` 建立上游跟踪关系。
+
+## 2026-11-18：Git 分支协作与 Pull Request
+
+### 1. 本课学习目标
+
+- 理解远程 feature 分支与 Pull Request 的关系。
+- 掌握 GitHub Pull Request 的创建和合并流程。
+- 理解 base、compare 和 Diff。
+- 理解 Merge commit 的结构。
+- 掌握 GitHub 合并后同步本地仓库的方法。
+- 初步了解 Merge commit、Squash merge 和 Rebase。
+
+### 2. 实际操作记录
+
+#### 2.1 推送 feature 分支
+
+```cmd
+git switch feature
+git push -u origin feature
+```
+
+`-u` 用于建立本地分支与远程跟踪分支的关联。
+
+本次建立的关联：
+
+```text
+feature -> origin/feature
+```
+
+#### 2.2 在 feature 分支开发新功能
+
+创建文件：
+
+```cmd
+echo This is a new feature for PR practice. > feature-demo.txt
+```
+
+提交：
+
+```cmd
+git add feature-demo.txt
+git commit -m "add feature demo for PR"
+git push
+```
+
+本次提交：
+
+```text
+6563c8e add feature demo for PR
+```
+
+#### 2.3 创建 Pull Request
+
+本次 PR：
+
+- PR 编号：#1
+- 标题：add feature demo for PR
+- base：main
+- compare：feature
+
+PR 的含义是：请求将 feature 分支的变更合并到 main 分支。
+
+**base 和 compare：**
+
+- base：目标分支，即希望合并到哪个分支。
+- compare：来源分支，即提供变更的分支。
+
+如果把两者反过来，就会变成请求将 main 的变更合并到 feature。
+
+#### 2.4 理解 Diff
+
+Diff 用于展示两个分支之间的文件差异：
+
+- `+`：新增内容。
+- `-`：删除内容。
+- `--- /dev/null`：表示原来不存在该文件。
+- `+++ b/feature-demo.txt`：表示新文件路径。
+
+本次 PR 新增了 `feature-demo.txt`，因此 Diff 显示一行 `+`。
+
+#### 2.5 Mergeable 的含义
+
+GitHub 显示 Mergeable，通常表示当前分支可以合并，没有已知的合并冲突。
+
+但不代表：
+
+- 已经通过人工 Code Review。
+- 代码逻辑一定正确。
+- 程序没有 Bug。
+- 自动化测试一定通过。
+
+因此，合并前仍然需要检查代码和测试结果。
+
+### 3. Pull Request 合并
+
+本次在 GitHub 上使用 Create a merge commit 完成合并。
+
+PR #1 已成功合并：
+
+```text
+PR #1: add feature demo for PR
+Merge commit: b75a9fb
+```
+
+### 4. Merge commit 的结构
+
+本次提交历史：
+
+```text
+*   b75a9fb (HEAD -> master, origin/main) Merge pull request #1
+|\
+| * 6563c8e (origin/feature, feature) add feature demo for PR
+* | ae0db89 Resolve merge conflict
+|\|
+| * 5fa5187 Update README on feature
+* | edcfacb Update README on master
+|/
+* fe0987f Add feature branch file
+* 7a2a676 Add second and third lesson notes
+* a210890 Initial commit
+```
+
+Merge commit 通常有两个父提交：
+
+- 第一父提交：合并前目标分支的提交，本次为 `ae0db89`。
+- 第二父提交：来源分支的提交，本次为 `6563c8e`。
+
+查看当前提交及父提交：
+
+```cmd
+git rev-list --parents -n 1 HEAD
+```
+
+普通提交通常只有一个父提交，Merge commit 通常有两个父提交。
+
+### 5. GitHub 合并后同步本地仓库
+
+本次执行：
+
+```cmd
+git switch master
+git pull
+```
+
+本地 master 跟踪远程 origin/main，因此 `git pull` 会同步远程 main 的更新。
+
+检查提交历史：
+
+```cmd
+git log --oneline --graph --decorate --all
+```
+
+检查工作区：
+
+```cmd
+git status
+```
+
+最终状态：
+
+```text
+On branch master
+Your branch is up to date with 'origin/main'.
+nothing to commit, working tree clean
+```
+
+说明本地 master 已经与远程 main 同步，工作区干净。
+
+### 6. 三种常见合并方式
+
+#### 6.1 Merge commit
+
+```cmd
+git merge feature
+```
+
+- 保留分支历史。
+- 创建合并提交。
+- 通常有两个父提交。
+
+#### 6.2 Squash merge
+
+```cmd
+git merge --squash feature
+git commit -m "Squash feature changes"
+```
+
+- 将 feature 的改动汇总到当前分支工作区。
+- 不自动创建双父提交的 Merge commit。
+- 需要手动执行 git commit。
+- 新提交通常只有一个父提交。
+
+#### 6.3 Rebase
+
+```cmd
+git rebase main
+```
+
+- 将当前分支的提交重新应用到 main 最新提交之后。
+- 通常会改变被重新应用提交的哈希。
+- 不创建传统的双父提交 Merge commit。
+
+### 7. 本课思考题
+
+1. Merge commit b75a9fb 有几个父提交？
+
+   答案：2 个。
+
+2. 执行 git pull 后，为什么本地 master 能看到 feature 的提交？
+
+   答案：因为远程 main 已经包含了 feature 的合并结果，git pull 将远程 main 的更新同步到了本地 master。
+
+3. git merge --squash 与普通 Merge commit 有什么区别？
+
+   答案：Squash 将 feature 的改动汇总成待提交的内容，不自动创建双父提交的 Merge commit，需要手动提交。
+
+### 8. 本课总结
+
+本课完成了一次完整的 GitHub 分支协作流程：
+
+1. 创建并推送远程 feature 分支。
+2. 在 feature 分支开发新功能。
+3. 创建 Pull Request。
+4. 理解 base、compare 和 Diff。
+5. 检查 PR 并在 GitHub 上合并。
+6. 使用 git pull 同步远程合并结果。
+7. 使用 git log --graph 查看合并历史。
