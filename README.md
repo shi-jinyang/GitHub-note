@@ -573,3 +573,121 @@ git rebase main
 5. 检查 PR 并在 GitHub 上合并。
 6. 使用 git pull 同步远程合并结果。
 7. 使用 git log --graph 查看合并历史。
+
+## 2026-11-19：Git Rebase 原理与实战
+
+### 1.学习目标
+
+- 理解 Git Rebase 的基本原理。
+- 掌握 Rebase 与 Merge 的区别。
+- 掌握 `git rebase` 的基本使用方法。
+- 学会处理 Rebase 过程中的冲突。
+- 理解为什么不应该随意 Rebase 公共分支。
+
+### 2.Rebase 基本原理
+
+Rebase 的作用是将当前分支上的提交重新应用到目标分支的最新提交之后。
+
+基本命令：
+
+```bash
+git switch feature
+git rebase master
+```
+
+注意：
+
+- 被重新整理的是当前分支。
+- 目标分支不会因为 Rebase 而被改写。
+- Rebase 通常会产生新的提交哈希。
+- Rebase 不代表已经将当前分支合并到目标分支。
+
+### 3.Rebase 实验
+
+本次实验创建了本地练习分支：
+
+```bash
+git switch -c rebase-practice master
+```
+
+在练习分支上创建提交：
+
+```text
+897b53f add first rebase practice commit
+```
+
+随后在 master 分支上创建新提交：
+
+```text
+49234ce add commit on master
+```
+
+切回练习分支并执行：
+
+```bash
+git switch rebase-practice
+git rebase master
+```
+
+Rebase 成功后，原提交被重新应用，哈希发生变化。
+
+### 4.Rebase 冲突处理实验
+
+本次制造了 `add/add` 类型冲突：
+
+- master 分支创建并修改 `conflict-demo.txt`。
+- rebase-practice 分支独立创建同名文件。
+- 执行 `git rebase master` 时发生冲突。
+
+冲突解决步骤：
+
+```bash
+# 编辑冲突文件，保留需要的内容
+git add conflict-demo.txt
+git rebase --continue
+```
+
+本次最终文件内容：
+
+```text
+master version
+
+feature version
+```
+
+最终提交历史关键部分：
+
+```text
+* 7459fbd (HEAD -> rebase-practice) modify conflict demo on feature
+* 7d7630d add first rebase practice commit
+* db6ad3a (master) modify conflict demo on master
+* 869c170 add conflict demo base
+* 49234ce add commit on master
+```
+
+实验结果：
+
+- Rebase 成功完成。
+- 原提交被重新创建，哈希发生变化。
+- master 分支没有被改写。
+- `git status` 显示工作区干净。
+
+### 5.Rebase 相关命令
+
+| 命令 | 作用 |
+|---|---|
+| `git rebase master` | 将当前分支提交重新应用到 master 后面 |
+| `git rebase --continue` | 解决冲突后继续 Rebase |
+| `git rebase --abort` | 放弃本次 Rebase |
+| `git rebase --skip` | 跳过当前正在重放的提交 |
+
+### 6.Rebase 与 Merge 的区别
+
+- Merge：合并分支，通常保留原有分支历史。
+- Rebase：重新应用提交，通常形成线性历史。
+- Rebase 会改变被重新应用提交的哈希。
+- 不要随意 Rebase 已经被其他开发人员使用的公共分支。
+
+### 7.本课总结
+
+本课完成了 Rebase 的原理学习、无冲突实验和冲突处理实验，掌握了 Rebase 的基本操作流程。
