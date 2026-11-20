@@ -691,3 +691,127 @@ feature version
 ### 7.本课总结
 
 本课完成了 Rebase 的原理学习、无冲突实验和冲突处理实验，掌握了 Rebase 的基本操作流程。
+
+## 2026-11-20：Git Reset 与 Git Revert
+
+### 1.学习目标
+
+- 理解 Git 的 HEAD、工作区、暂存区和本地仓库。
+- 掌握 `git reset` 的三种模式。
+- 理解 `git revert` 的工作原理。
+- 理解 Reset 与 Revert 的区别。
+- 掌握不同场景下撤销提交的方法。
+
+### 2.Git Reset
+
+`git reset` 的核心作用是移动当前分支的 HEAD 指针到指定提交，并根据模式决定是否重置暂存区和工作区。
+
+基本命令：
+
+```bash
+git reset HEAD~1
+```
+
+表示将当前分支回退到上一个提交。
+
+#### 2.1 --soft
+
+```bash
+git reset --soft HEAD~1
+```
+
+- HEAD 移动。
+- 暂存区保留修改。
+- 工作区保留修改。
+
+实验结果：撤销 Version 3 提交后，Version 3 的修改仍然保留在暂存区。
+
+#### 2.2 --mixed
+
+```bash
+git reset --mixed HEAD~1
+```
+
+- HEAD 移动。
+- 暂存区重置。
+- 工作区保留修改。
+
+实验结果：Version 3 的修改从暂存区变成工作区中的未暂存修改。
+
+注意：`--mixed` 是 Git Reset 的默认模式。
+
+#### 2.3 --hard
+
+```bash
+git reset --hard HEAD~1
+```
+
+- HEAD 移动。
+- 暂存区重置。
+- 工作区重置。
+
+实验结果：Version 3 的未提交修改被丢弃，文件恢复为 Version 2。
+
+注意：`--hard` 可能造成未提交修改丢失，使用前必须检查工作区状态。
+
+### 3.Git Revert
+
+`git revert` 不会删除原提交，而是创建一个新的提交，用于抵消指定提交带来的修改。
+
+基本命令：
+
+```bash
+git revert HEAD
+```
+
+本次实验：
+
+原提交：
+
+```text
+5c0aea7 add reset demo version 3 again
+```
+
+撤销后：
+
+```text
+884d1aa Revert "add reset demo version 3 again"
+5c0aea7 add reset demo version 3 again
+```
+
+实验结果：
+
+- 原提交仍然保留在历史中。
+- Git 创建了新的撤销提交。
+- 文件中的 Version 3 被删除。
+- 工作区干净。
+
+### 4.Reset 与 Revert 的区别
+
+| 对比 | Reset | Revert |
+|---|---|---|
+| 工作方式 | 移动 HEAD | 创建新的反向提交 |
+| 是否改写当前分支历史 | 是 | 否 |
+| 原提交是否保留在当前历史中 | 通常不再属于当前分支历史 | 保留 |
+| 常见使用场景 | 本地提交整理 | 已推送或多人协作 |
+
+### 5.实际使用建议
+
+1. 本地尚未共享的错误提交，可以考虑使用 Reset。
+2. 已经推送到远程、其他人可能已经拉取的提交，通常优先使用 Revert。
+3. 使用 `git reset --hard` 前，务必确认没有需要保留的未提交修改。
+
+### 6.本课实验结果
+
+实验分支：`reset-practice`
+
+实验文件：`reset-demo.txt`
+
+完成的实验：
+
+- 创建 Version 1、Version 2、Version 3 三个版本。
+- 使用 `git reset --soft` 撤销提交，观察暂存区保留修改。
+- 使用 `git reset --mixed` 重置暂存区，观察工作区保留修改。
+- 使用 `git reset --hard` 丢弃未提交修改。
+- 重新创建 Version 3 提交。
+- 使用 `git revert HEAD` 创建反向提交，成功撤销 Version 3。
