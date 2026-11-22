@@ -815,3 +815,95 @@ git revert HEAD
 - 使用 `git reset --hard` 丢弃未提交修改。
 - 重新创建 Version 3 提交。
 - 使用 `git revert HEAD` 创建反向提交，成功撤销 Version 3。
+
+## 第十五课：Git Reflog —— 找回丢失的提交
+
+### 1.本课学习目标
+
+1. 理解 Git Reflog 的作用。
+2. 掌握 `git reflog` 和 `HEAD@{n}`。
+3. 理解 Reflog 与 `git log` 的区别。
+4. 学会恢复被 `git reset --hard` 移出当前分支历史的提交。
+
+### 2.核心知识点
+
+#### 2.1 git log 与 git reflog
+
+- `git log`：查看从当前引用出发能够访问到的提交历史。
+- `git reflog`：查看本地 HEAD 和其他引用的变化历史。
+- `HEAD@{0}`：最近一次 HEAD 变化。
+- `HEAD@{1}`：上一次 HEAD 变化。
+
+Reflog 不只是记录 commit，还会记录 reset、checkout、rebase 等操作导致的引用变化。
+
+#### 2.2 git reset --hard 与提交对象
+
+执行：
+
+```bash
+git reset --hard HEAD~2
+```
+
+会移动当前分支引用，并重置暂存区和工作区。
+
+原来的提交不再属于当前分支历史，但提交对象不一定立即被删除。
+
+#### 2.3 使用 Reflog 恢复提交
+
+实验中，Reset 前的提交：
+
+```text
+3259750 Version 3
+c131e78 Version 2
+201659a Version 1
+```
+
+执行 `git reset --hard HEAD~2` 后，当前分支回退到：
+
+```text
+201659a Version 1
+```
+
+通过：
+
+```bash
+git reflog -10
+```
+
+找到了原来的 Version 3 提交：
+
+```text
+3259750 HEAD@{1}: commit: add reflog demo version 3
+```
+
+创建恢复分支：
+
+```bash
+git branch reflog-recovered 3259750
+git switch reflog-recovered
+```
+
+恢复成功，文件内容重新变为：
+
+```text
+Version 1
+Version 2
+Version 3
+```
+
+### 3.本课实验结果
+
+- 成功创建三个连续提交。
+- 成功查看 Reflog。
+- 成功模拟 `git reset --hard HEAD~2` 误操作。
+- 成功通过 Reflog 找到原来的提交。
+- 成功创建 `reflog-recovered` 分支。
+- 成功恢复 Version 1、Version 2、Version 3。
+- 最终工作区干净，恢复分支指向 `3259750`。
+
+### 4.重要注意事项
+
+1. Reflog 是本地记录，不会自动推送到远程仓库。
+2. Reflog 有过期机制，不是永久备份。
+3. 发现误操作后应尽快恢复提交。
+4. 推荐先使用 `git branch` 创建恢复分支，避免直接使用 `reset --hard` 覆盖当前工作区。
