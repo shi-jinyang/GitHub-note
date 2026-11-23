@@ -816,7 +816,7 @@ git revert HEAD
 - 重新创建 Version 3 提交。
 - 使用 `git revert HEAD` 创建反向提交，成功撤销 Version 3。
 
-## 第十五课：Git Reflog —— 找回丢失的提交
+## 2026-11-22：Git Reflog —— 找回丢失的提交
 
 ### 1.本课学习目标
 
@@ -907,3 +907,95 @@ Version 3
 2. Reflog 有过期机制，不是永久备份。
 3. 发现误操作后应尽快恢复提交。
 4. 推荐先使用 `git branch` 创建恢复分支，避免直接使用 `reset --hard` 覆盖当前工作区。
+
+## 2026-11-23：Git 底层对象模型
+
+### 1.本课学习目标
+
+理解 Git 的底层对象存储机制，掌握 Blob、Tree、Commit、Tag 四种核心对象及其关系。
+
+### 2.Git 的四种核心对象
+
+2.2 **Blob Object**
+   - 保存文件内容，不保存文件名和目录路径。
+   - 相同内容会生成相同的 Blob 哈希。
+   - 文件内容发生变化时，会生成新的 Blob 对象，旧对象不会被直接修改。
+
+2.2 **Tree Object**
+   - 保存目录结构。
+   - 记录文件名、文件模式、对象类型及对象哈希。
+   - 可以指向 Blob 或其他 Tree。
+
+2.3 **Commit Object**
+   - 指向项目快照的根 Tree。
+   - 保存父提交、作者、提交者、时间和提交说明。
+   - 每个 Commit 逻辑上描述完整项目快照。
+
+2.4 **Tag Object**
+   - 附注标签对应一个 Tag Object。
+   - 保存目标对象、目标类型、标签名、创建者、时间和标签说明。
+
+### 3.Git 对象之间的关系
+
+```text
+Commit
+  |
+  v
+Root Tree
+  |
+  +---- Blob
+  |
+  +---- Blob
+  |
+  +---- Sub Tree
+          |
+          +---- Blob
+
+Annotated Tag
+  |
+  v
+Tag Object
+  |
+  v
+Commit
+```
+
+轻量标签只是引用，直接指向 Commit；附注标签则指向 Tag Object。
+
+### 4.实际实验记录
+
+在 Windows CMD 和 GitHub-Practice 仓库中完成以下实验：
+
+1. 使用 `git cat-file -t` 查看对象类型。
+2. 使用 `git cat-file -p` 查看 Commit、Tree、Tag 和 Blob 内容。
+3. 使用 `git hash-object` 计算文件内容的哈希。
+4. 使用 `git hash-object -w` 将 Blob 写入对象数据库。
+5. 验证相同内容生成相同哈希。
+6. 修改文件内容，验证新内容生成新的 Blob。
+7. 使用 `git add` 将文件加入暂存区。
+8. 使用 `git write-tree` 将整个暂存区写成 Tree Object。
+9. 创建轻量标签 `v1.0` 和附注标签 `v2.0`，比较二者的底层区别。
+
+### 5.关键实验结果
+
+- `Hello Git!` 对应 Blob 哈希：
+  `14a4db2254d0aa7a9f882e528582d1afde6ff2ce`
+- `Hello Git!!` 对应 Blob 哈希：
+  `32826a5a5ddce1c39a03cddcf4613f8d65bd999b`
+- 两个内容相同的文件生成相同 Blob 哈希。
+- `git write-tree` 生成的 Tree 哈希：
+  `7ed4fb6ab76b7885a3f8d092910ede5c06efa5c9`
+- `git cat-file -t v1.0` 输出 `commit`。
+- `git cat-file -t v2.0` 输出 `tag`。
+
+### 6.本课总结
+
+Git 使用内容寻址的对象数据库组织项目历史。
+
+Commit 指向 Tree，Tree 指向 Blob 或子 Tree。相同内容可以复用已有 Blob，因此 Git 虽然逻辑上为每次提交保存完整快照，但不需要重复存储所有未变化的文件内容。
+
+### 7.实验现场状态
+
+- `hash-demo.txt` 和 `hash-demo-2.txt` 已创建，当前保留在工作区。
+- 两个文件已从暂存区撤销，当前为未跟踪文件。
+- Blob 和 Tree 对象实验已完成。
