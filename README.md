@@ -999,3 +999,88 @@ Commit 指向 Tree，Tree 指向 Blob 或子 Tree。相同内容可以复用已�
 - `hash-demo.txt` 和 `hash-demo-2.txt` 已创建，当前保留在工作区。
 - 两个文件已从暂存区撤销，当前为未跟踪文件。
 - Blob 和 Tree 对象实验已完成。
+
+## 2026-11-24：Git 引用系统、HEAD 与分支的底层关系
+
+### 1.本课学习目标
+
+理解 Git Reference（引用）的概念，掌握分支、HEAD、Detached HEAD 的底层关系，了解 Reflog 的存储结构，以及 Loose refs、Packed refs 和 `git update-ref`。
+
+### 2.核心知识点
+
+#### 2.1 Git 引用（Reference）
+
+- 引用为 Git 对象提供可读名称。
+- 本地分支引用：`refs/heads/`
+- 标签引用：`refs/tags/`
+- 远程跟踪引用：`refs/remotes/`
+- 分支本质上是指向 Commit 的可移动引用，不是代码副本。
+
+#### 2.2 HEAD 与 Attached HEAD
+
+- Attached HEAD：`.git/HEAD` 保存 `ref: refs/heads/分支名`。
+- HEAD 通过分支引用间接指向 Commit。
+- 在 Attached HEAD 状态下创建提交，当前分支引用和 HEAD 最终指向的新 Commit 一起移动。
+
+#### 2.3 Detached HEAD
+
+- Detached HEAD：`.git/HEAD` 直接保存 Commit 哈希。
+- 可以在 Detached HEAD 状态下创建提交。
+- 创建提交时 HEAD 移动，但原分支引用不会自动移动。
+- 可以使用 `git switch -c 新分支名` 创建分支保存当前提交。
+
+#### 2.4 Reflog
+
+- Reflog 记录本地引用的移动历史。
+- `git reflog` 查看 HEAD 的移动记录。
+- `git reflog show 分支名` 查看指定分支的 Reflog。
+- `.git/logs/HEAD` 保存 HEAD Reflog。
+- `.git/logs/refs/heads/分支名` 保存对应分支的 Reflog。
+- Reflog 不会自动同步到远程仓库。
+
+Reflog 每条记录包含：
+- 旧对象哈希
+- 新对象哈希
+- 操作者
+- 时间戳
+- 时区
+- 操作说明
+
+#### 2.5 Loose refs 与 Packed refs
+
+- Loose refs：引用分别保存在独立文件中。
+- Packed refs：多个引用集中保存在 `.git/packed-refs`。
+- Git 可以根据需要管理引用的存储形式。
+- 引用打包与 Git 对象打包是不同概念。
+
+#### 2.6 git update-ref
+
+- `git update-ref <refname> <new-val>`：创建或更新引用。
+- `git update-ref -d <refname>`：删除引用。
+- `-m`：为引用更新添加说明。
+- 不建议手动修改 `.git` 内部引用文件，应使用 Git 提供的命令。
+
+### 3.实际实验记录
+
+1. 查看 `.git/HEAD`，确认 HEAD 指向 `reflog-recovered`。
+2. 查看 `.git/refs/heads/reflog-recovered`，确认其指向 Commit `3259750`。
+3. 查看标签引用，验证轻量标签直接指向 Commit，附注标签指向 Tag Object。
+4. 使用 `git checkout <commit-hash>` 进入 Detached HEAD。
+5. 在 Detached HEAD 状态下创建 Commit `a7114ff`。
+6. 验证 HEAD 移动到 `a7114ff`，原来的 `reflog-recovered` 仍指向 `3259750`。
+7. 使用 `git switch -c detached-recovered` 创建新分支，成功保存 `a7114ff`。
+8. 使用 `git reflog -8` 查看 HEAD 移动历史。
+9. 使用 `git reflog show reflog-recovered` 查看指定分支的 Reflog。
+10. 查看 `.git/logs/HEAD` 和 `.git/logs/refs/heads/reflog-recovered`，分析 Reflog 文件格式。
+11. 检查 `.git/packed-refs`，本次实验中该文件不存在。
+12. 使用 `git update-ref -h` 查看引用管理命令帮助。
+13. 使用 `git rev-parse HEAD` 和 `git show-ref --heads` 验证 HEAD 与本地分支引用的关系。
+
+### 4.实验结果
+
+- Detached HEAD 下成功创建提交 `a7114ff`。
+- 成功创建 `detached-recovered` 分支保存该提交。
+- 原有 `reflog-recovered` 仍指向 `3259750`，未被移动。
+- 成功区分 HEAD Reflog 和分支 Reflog。
+- 本次没有执行 `git update-ref` 的实际修改操作，仅查看了帮助信息。
+
