@@ -1177,3 +1177,86 @@ git config --global --unset alias.lg
 7. 查看了 `%USERPROFILE%\.gitconfig` 的实际内容。
 8. 使用 `alias.course` 验证多值配置。
 9. 成功创建并使用 `git lg` 别名。
+
+## 2026-11-26：Git 常用高级技巧与工作流总结
+
+### 1.学习目标
+
+掌握 Git 中几种常用的高级命令，理解它们的适用场景，并能够组合使用这些命令完成实际开发任务。
+
+### 2.学习内容
+
+#### 2.1 git stash：临时保存修改
+
+学习了：
+- `git stash`：临时保存工作区和暂存区的修改。
+- `git stash list`：查看 stash 记录。
+- `git stash apply`：恢复修改，但保留 stash 记录。
+- `git stash pop`：恢复修改，成功后删除 stash 记录。
+- `git stash drop`：删除指定 stash 记录。
+- `git stash clear`：清空所有 stash 记录。
+
+实验结果：
+- 成功保存未提交的修改。
+- 成功恢复文件内容和暂存状态。
+- 成功删除 stash 记录。
+- 验证了默认情况下普通未跟踪文件不会被 stash 保存。
+
+#### 2.2 git cherry-pick：选择性应用提交
+
+学习了：
+- `git cherry-pick <commit>`：将指定提交应用到当前分支。
+- `git cherry-pick --continue`：解决冲突后继续操作。
+- `git cherry-pick --abort`：取消当前 cherry-pick 操作。
+- `git cherry-pick --skip`：跳过当前提交。
+
+实验结果：
+- 创建 `main-practice` 和 `feature-practice` 两个分支。
+- 成功将 Feature A 的指定提交应用到 main-practice。
+- 成功制造并解决 cherry-pick 冲突。
+- 最终保留了冲突双方的文件内容。
+
+#### 2.3 git blame：追踪代码修改来源
+
+学习了：
+- `git blame <file>`：查看文件每一行最后修改的提交和作者。
+- `git blame -L 2,3 <file>`：查看指定行范围。
+- `git blame -w`：忽略空白字符变化。
+- `git blame -e`：显示作者邮箱。
+
+实验结果：
+- 成功追踪 `cherry-demo.txt` 每一行的修改来源。
+- 确认不同代码行可以对应不同提交。
+- 理解了 blame 显示的是最后修改归属，不一定是最初编写者。
+
+#### 2.4 git bisect：二分查找 Bug
+
+学习了：
+- `git bisect start`：开始二分查找。
+- `git bisect good`：标记正常版本。
+- `git bisect bad`：标记有问题的版本。
+- `git bisect reset`：结束查找并返回原分支。
+- `git bisect run`：使用自动化脚本判断提交状态。
+
+实验结果：
+- 以 `3259750` 为 good，以 `162b4a3` 为 bad。
+- 通过模拟判断，最终定位到 `b7e27f8 Add feature A`。
+- 成功执行 `git bisect reset`，返回 `main-practice` 分支。
+
+注意：本次 good/bad 判断是教学模拟，并非真实项目 Bug 测试。
+
+### 3.Git 工作流总结
+
+典型功能开发流程：
+
+1. 使用 `git switch -c` 创建功能分支。
+2. 修改代码，使用 `git add` 和 `git commit` 保存修改。
+3. 需要临时切换任务时使用 `git stash`。
+4. 使用 `git merge` 整合分支，或使用 `git cherry-pick` 移植指定提交。
+5. 使用 `git blame` 追踪代码修改来源。
+6. 使用 `git bisect` 定位引入 Bug 的提交。
+7. 使用 `git push` 推送分支，并在 GitHub 上创建 Pull Request。
+
+### 4.本课总结
+
+掌握了 stash、cherry-pick、blame、bisect 四个常用高级命令，并完成了相应实验。
