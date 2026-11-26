@@ -1084,3 +1084,96 @@ Reflog 每条记录包含：
 - 成功区分 HEAD Reflog 和分支 Reflog。
 - 本次没有执行 `git update-ref` 的实际修改操作，仅查看了帮助信息。
 
+## 2026-11-26：Git 配置系统（System、Global、Local 与配置优先级）
+
+### 1.学习目标
+
+- 理解 Git 的三种配置作用域。
+- 掌握不同配置作用域的优先级。
+- 学会查看配置来源、设置和删除配置。
+- 理解 Git 多值配置。
+- 学会使用 Git 命令别名。
+
+### 2.核心知识点
+
+#### 2.1 三种配置作用域
+
+| 作用域 | 参数 | 配置文件 | 影响范围 |
+|---|---|---|---|
+| System | `--system` | Git 安装目录下的 `etc/gitconfig` | 当前计算机上的所有用户 |
+| Global | `--global` | 用户目录下的 `.gitconfig` | 当前用户的所有仓库 |
+| Local | `--local` | 当前仓库的 `.git/config` | 当前仓库 |
+
+配置优先级：
+
+**Local > Global > System**
+
+高优先级配置覆盖低优先级配置，但不会删除低优先级配置。
+
+#### 2.2 查看配置
+
+```cmd
+git config --list
+git config --list --show-origin
+git config --system --list
+git config --global --list
+git config --local --list
+git config --show-origin user.name
+```
+
+#### 2.3 设置和删除配置
+
+```cmd
+git config --global user.name "用户名"
+git config --local user.name "项目用户名"
+
+git config --global --unset user.course
+git config --global --unset-all alias.course
+```
+
+#### 2.4 多值配置
+
+```cmd
+git config --global --add alias.course first
+git config --global --add alias.course second
+
+git config --global --get alias.course
+git config --global --get-all alias.course
+```
+
+- `--add`：添加一个值，不覆盖已有值。
+- `--get`：获取一个匹配值，本次实验中返回最后一个值。
+- `--get-all`：获取全部匹配值。
+- `--unset-all`：删除该配置项的所有值。
+
+#### 2.5 Git 命令别名
+
+设置：
+
+```cmd
+git config --global alias.lg "log --oneline --graph --decorate --all"
+```
+
+使用：
+
+```cmd
+git lg
+```
+
+删除：
+
+```cmd
+git config --global --unset alias.lg
+```
+
+### 3.实验记录
+
+1. 查看了本机的 System、Global、Local 配置。
+2. 确认 Global 用户名为 `shi-jinyang`，邮箱为 GitHub noreply 邮箱。
+3. 确认 Global HTTP/HTTPS 代理为 `127.0.0.1:7890`。
+4. 使用 `user.course` 验证 Local 配置优先于 Global。
+5. 删除 Local 测试配置后，Git 自动读取 Global 配置。
+6. 删除测试配置，恢复实验环境。
+7. 查看了 `%USERPROFILE%\.gitconfig` 的实际内容。
+8. 使用 `alias.course` 验证多值配置。
+9. 成功创建并使用 `git lg` 别名。
