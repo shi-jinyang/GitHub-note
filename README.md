@@ -1260,3 +1260,71 @@ git config --global --unset alias.lg
 ### 4.本课总结
 
 掌握了 stash、cherry-pick、blame、bisect 四个常用高级命令，并完成了相应实验。
+
+## 2026-11-27：Git 综合实战——从本地开发到 GitHub 协作
+
+### 1.本课目标
+
+掌握从本地功能开发到 GitHub Pull Request 合并的完整流程，并理解本地分支与远程分支的同步关系。
+
+### 2.实验过程与实际结果
+
+2.1 **创建功能分支**
+   - 创建 `lesson20-git-final-project`。
+   - 原因：隔离功能开发，避免直接在主分支上进行开发。
+
+2.2 **创建项目文件**
+   - 创建 `project-info.txt`。
+   - 内容包括项目名称、版本、开发者和功能说明。
+
+2.3 **选择性暂存与提交**
+   - 使用 `git add project-info.txt` 暂存指定文件。
+   - 使用 `git diff --cached` 检查暂存内容。
+   - 成功提交：
+     - `163a0cb Add project information`
+
+2.4 **推送功能分支**
+   - 执行 `git push -u origin lesson20-git-final-project`。
+   - 推送成功，并建立本地分支与远程分支的跟踪关系。
+
+2.5 **创建 Pull Request**
+   - Base：`main`
+   - Compare：`lesson20-git-final-project`
+   - 检查 Files changed 和 Commits。
+   - 理解 `Able to merge` 表示当前不存在阻止合并的冲突，不代表已经合并。
+
+2.6 **合并 Pull Request**
+   - GitHub 显示 Pull request successfully merged and closed。
+   - PR #2 合并成功。
+
+2.7 **同步远程 main**
+   - 执行 `git fetch origin`。
+   - 远程跟踪分支 `origin/main` 从 `b75a9fb` 更新到 `cafa2b5`。
+   - 创建本地分支 `lesson20-main-sync`，跟踪 `origin/main`。
+
+2.8 **检查同步结果**
+   - `git status` 显示本地分支与 `origin/main` 同步。
+   - 最新提交为 `cafa2b5`。
+   - 提交历史中包含 `163a0cb Add project information`。
+   - 两个历史实验文件 `hash-demo.txt` 和 `hash-demo-2.txt` 仍保持未跟踪状态，没有加入本次提交。
+
+### 3.本课重点知识
+
+- 功能分支用于隔离开发工作。
+- `git push -u` 用于设置上游跟踪分支。
+- PR 的 Base 是目标分支，Compare 是来源分支。
+- `Able to merge` 不等于已经合并。
+- `git fetch` 下载远程更新，但不自动整合到当前本地分支。
+- `git pull` 通常包含 fetch 和后续整合操作。
+- `ahead` 表示本地领先远程，`behind` 表示本地落后远程。
+- 不要在不了解分支历史的情况下直接合并或推送旧实验分支。
+
+### 4.后续学习方向
+
+Git/GitHub 入门第一阶段（第 1～20 课）已完成。
+
+下一阶段可学习：
+- GitHub Actions 与 CI/CD。
+- GitHub 开源项目协作。
+- Issue、Fork、Upstream、贡献 PR。
+- 实际参与开源项目。
